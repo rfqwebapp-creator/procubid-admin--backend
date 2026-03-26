@@ -47,4 +47,56 @@ const toggleUserStatus = (req, res) => {
 
 };
 
-module.exports = { deleteUser, toggleUserStatus };
+
+
+// UPDATE ROLE
+const updateRole = (req, res) => {
+  const { id } = req.params;
+  const { name, description, module } = req.body;
+
+  const sql = `
+    UPDATE roles 
+    SET name = ?, description = ?, module = ?
+    WHERE id = ?
+  `;
+
+  db.query(sql, [name, description, module, id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: "Error updating role" });
+    }
+
+    res.json({
+      success: true,
+      message: "Role updated successfully"
+    });
+  });
+};
+
+
+
+// DELETE ROLE
+const deleteRole = (req, res) => {
+  const { id } = req.params;
+
+  const sql = "DELETE FROM roles WHERE id = ?";
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      return res.status(500).json({ message: "Error deleting role" });
+    }
+
+    res.json({
+      success: true,
+      message: "Role deleted successfully"
+    });
+  });
+};
+
+
+
+module.exports = { 
+  deleteUser, 
+  toggleUserStatus,
+  updateRole,
+  deleteRole
+};
