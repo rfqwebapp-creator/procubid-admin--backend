@@ -5,6 +5,7 @@ const userRoutes = require("./routes/userRoutes");
 const roleRoutes = require("./routes/roleRoutes");
 const permissionRoutes = require("./routes/permissionRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const orgRoutes = require("./routes/organization");
 
 
 const cors = require("cors");
@@ -21,6 +22,8 @@ app.use("/api", userRoutes);
 
 app.use("/api", roleRoutes);
 app.use("/api", permissionRoutes);
+
+app.use("/api/organizations", orgRoutes);
 
 app.use("/api/admin", adminRoutes);
 
