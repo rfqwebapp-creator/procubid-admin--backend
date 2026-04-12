@@ -6,6 +6,21 @@ const db = require("../config/db"); // mysql connection
 
 console.log("ORGANIZATION ROUTES LOADED");
 
+// GET all organizations
+router.get("/", (req, res) => {
+  const sql = "SELECT * FROM organizations ORDER BY id DESC";
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("FETCH ERROR:", err);
+      return res.status(500).json({ error: "DB fetch error" });
+    }
+
+    return res.json(result);
+  });
+});
+
+
 router.post("/add", async (req, res) => {
   console.log("ADD ORGANIZATION HIT");
   console.log("BODY:", req.body);
