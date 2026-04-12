@@ -4,7 +4,11 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db"); // mysql connection
 
+console.log("ORGANIZATION ROUTES LOADED");
+
 router.post("/add", async (req, res) => {
+  console.log("ADD ORGANIZATION HIT");
+  console.log("BODY:", req.body);
   try {
     const {
       company_name,
