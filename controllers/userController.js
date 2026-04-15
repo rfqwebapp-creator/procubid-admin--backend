@@ -3,18 +3,18 @@ const db = require("../config/db");
 // GET ALL RegCustomers
 exports.getUsers = (req, res) => {
   const sql = `
-    SELECT 
+    SELECT
       id,
-      firstname,
-      lastname,
-      email,
-      phone,
       country,
+      email,
+      firstName AS firstname,
+      lastName AS lastname,
+      phone,
       industry,
-      worknumber,
+      workNumber AS worknumber,
       gst,
-      companyname,
-      referralcode,
+      companyName AS companyname,
+      referralCode AS referralcode,
       status
     FROM RegCustomers
     ORDER BY id DESC
@@ -26,26 +26,7 @@ exports.getUsers = (req, res) => {
       return res.status(500).json(err);
     }
 
-    const formattedUsers = result.map((user) => ({
-      id: user.id,
-      firstname: user.firstname || "",
-      lastname: user.lastname || "",
-      name: `${user.firstname || ""} ${user.lastname || ""}`.trim(),
-      email: user.email || "",
-      phone: user.phone || "",
-      country: user.country || "",
-      industry: user.industry || "",
-      worknumber: user.worknumber || "",
-      gst: user.gst || "",
-      companyname: user.companyname || "",
-      referralcode: user.referralcode || "",
-      role: "Customer",
-      organization: user.companyname || "-",
-      status: user.status || "Active",
-      last_login: "-"
-    }));
-
-    res.json(formattedUsers);
+    res.json(result);
   });
 };
 
@@ -78,7 +59,7 @@ exports.toggleUserStatus = (req, res) => {
 
       res.json({
         message: "User status updated",
-        status: newStatus
+        status: newStatus,
       });
     });
   });
@@ -90,14 +71,14 @@ exports.deleteUser = (req, res) => {
 
   const deleteSql = "DELETE FROM RegCustomers WHERE id = ?";
 
-  db.query(deleteSql, [userId], (err, result) => {
+  db.query(deleteSql, [userId], (err) => {
     if (err) {
       console.log("DELETE USER ERROR:", err);
       return res.status(500).json(err);
     }
 
     res.json({
-      message: "User deleted successfully"
+      message: "User deleted successfully",
     });
   });
 };
