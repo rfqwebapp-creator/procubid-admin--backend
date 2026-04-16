@@ -10,17 +10,34 @@ exports.getRoles = (req, res) => {
       return res.status(500).json({ message: "DB error" });
     }
 
-    const formatted = result.map((role) => ({
-      ...role,
-      permissions:
-        typeof role.permissions === "string"
-          ? JSON.parse(role.permissions)
-          : role.permissions,
-      field_permissions:
-        typeof role.field_permissions === "string"
-          ? JSON.parse(role.field_permissions)
-          : role.field_permissions,
-    }));
+    const formatted = result.map((role) => {
+      let parsedPermissions = [];
+      let parsedFieldPermissions = [];
+
+      try {
+        parsedPermissions =
+          typeof role.permissions === "string"
+            ? JSON.parse(role.permissions)
+            : role.permissions || [];
+      } catch {
+        parsedPermissions = [];
+      }
+
+      try {
+        parsedFieldPermissions =
+          typeof role.field_permissions === "string"
+            ? JSON.parse(role.field_permissions)
+            : role.field_permissions || [];
+      } catch {
+        parsedFieldPermissions = [];
+      }
+
+      return {
+        ...role,
+        permissions: parsedPermissions,
+        field_permissions: parsedFieldPermissions,
+      };
+    });
 
     res.json(formatted);
   });
@@ -32,8 +49,9 @@ exports.deleteRole = (req, res) => {
 
   const sql = "DELETE FROM roles WHERE id = ?";
 
-  db.query(sql, [id], (err, result) => {
+  db.query(sql, [id], (err) => {
     if (err) {
+      console.error("DELETE ROLE ERROR:", err);
       return res.status(500).json({ message: "Delete error" });
     }
 
@@ -49,7 +67,25 @@ exports.updateRole = (req, res) => {
   console.log("REQ BODY:", req.body);
 
   const { id } = req.params;
-  const { name, description, permissions, field_permissions } = req.body;
+  let { name, description, permissions, field_permissions } = req.body;
+
+  // 🔥 FIX: Ensure permissions is array
+  if (typeof permissions === "string") {
+    try {
+      permissions = JSON.parse(permissions);
+    } catch {
+      permissions = [];
+    }
+  }
+
+  // 🔥 FIX: Ensure field_permissions is array
+  if (typeof field_permissions === "string") {
+    try {
+      field_permissions = JSON.parse(field_permissions);
+    } catch {
+      field_permissions = [];
+    }
+  }
 
   const sql = `
     UPDATE roles
@@ -66,7 +102,7 @@ exports.updateRole = (req, res) => {
       JSON.stringify(field_permissions || []),
       id,
     ],
-    (err, result) => {
+    (err) => {
       if (err) {
         console.error("UPDATE ROLE ERROR:", err);
         return res.status(500).json({ message: "Update error" });
