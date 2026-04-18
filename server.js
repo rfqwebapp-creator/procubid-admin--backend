@@ -25,7 +25,7 @@ app.use("/api", roleRoutes);
 app.use("/api", permissionRoutes);
 
 app.use("/api/organizations", orgRoutes);
-app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/admin/api/subscriptions", subscriptionRoutes);
 
 app.use("/api/admin", adminRoutes);
 
