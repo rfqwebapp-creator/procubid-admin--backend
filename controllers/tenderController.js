@@ -25,7 +25,7 @@ exports.getAdminTenders = (req, res) => {
     FROM rfqs r
     LEFT JOIN RegCustomers rc
       ON r.user_id = rc.id
-    ORDER BY r.id DESC
+    ORDER BY r.id 
   `;
 
   db.query(sql, (error, rows) => {
