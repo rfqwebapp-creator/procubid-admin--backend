@@ -21,7 +21,7 @@ exports.getAdminTenders = (req, res) => {
         NULLIF(TRIM(CONCAT(COALESCE(rc.firstName, ''), ' ', COALESCE(rc.lastName, ''))), ''),
         'Unknown Buyer'
       ) AS buyer,
-      COALESCE(NULLIF(r.classification, ''), 'N/A') AS classification
+      COALESCE(NULLIF(r.selected_industry, ''), 'N/A') AS classification
     FROM rfqs r
     LEFT JOIN RegCustomers rc
       ON r.user_id = rc.id
