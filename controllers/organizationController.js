@@ -39,7 +39,7 @@ exports.getOrganizationDetails = (req, res) => {
       cp.user_id
     FROM organizations o
     LEFT JOIN company_profile cp 
-      ON cp.email = o.email
+      WHERE email = o.email
     WHERE o.id = ?
     LIMIT 1
   `;
@@ -52,6 +52,9 @@ exports.getOrganizationDetails = (req, res) => {
         message: "Failed to fetch organization details",
       });
     }
+
+        console.log("Requested organization id:", id);
+    console.log("Organization details result:", result);
 
     if (!result || result.length === 0) {
       return res.status(404).json({
