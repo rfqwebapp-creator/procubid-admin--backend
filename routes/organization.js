@@ -1,8 +1,7 @@
-// routes/organization.js
-
 const express = require("express");
 const router = express.Router();
-const db = require("../config/db"); // mysql connection
+const db = require("../config/db");
+const { getOrganizationDetails } = require("../controllers/organizationController");
 
 console.log("ORGANIZATION ROUTES LOADED");
 
@@ -20,10 +19,11 @@ router.get("/", (req, res) => {
   });
 });
 
-
+// ADD organization
 router.post("/add", async (req, res) => {
   console.log("ADD ORGANIZATION HIT");
   console.log("BODY:", req.body);
+
   try {
     const {
       company_name,
@@ -48,12 +48,17 @@ router.post("/add", async (req, res) => {
           console.error(err);
           return res.status(500).json({ error: "DB error" });
         }
-        res.json({ message: "Organization added" });
+
+        return res.json({ message: "Organization added" });
       }
     );
   } catch (err) {
-    res.status(500).json({ error: "Server error" });
+    console.error("ADD ORGANIZATION ERROR:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
+
+// GET single organization full details
+router.get("/:id/details", getOrganizationDetails);
 
 module.exports = router;
