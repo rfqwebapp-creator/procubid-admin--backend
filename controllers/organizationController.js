@@ -3,69 +3,89 @@ const db = require("../config/db");
 exports.getOrganizationDetails = (req, res) => {
   const { id } = req.params;
 
-  const sql = `
+  const orgSql = `
     SELECT 
-      o.id AS organization_id,
-      o.company_name,
-      o.email AS organization_email,
-      o.role_type,
-      o.sector,
-      o.region,
-      o.status,
-
-      cp.id AS company_profile_id,
-      cp.legal_name,
-      cp.address,
-      cp.country,
-      cp.phone,
-      cp.email,
-      cp.type,
-      cp.size,
-      cp.industry,
-      cp.reg_number,
-      cp.vat,
-      cp.inc_date,
-      cp.procurement_count,
-      cp.about,
-      cp.linkedin,
-      cp.twitter,
-      cp.facebook,
-      cp.instagram,
-      cp.youtube,
-      cp.nda_required,
-      cp.vendor_form_required,
-      cp.logo,
-      cp.cover_image,
-      cp.user_id
-    FROM organizations o
-    LEFT JOIN company_profile cp 
-      WHERE email = o.email
-    WHERE o.id = ?
+      id AS organization_id,
+      company_name,
+      email AS organization_email,
+      role_type,
+      sector,
+      region,
+      status
+    FROM organizations
+    WHERE id = ?
     LIMIT 1
   `;
 
-  db.query(sql, [id], (err, result) => {
-    if (err) {
-      console.error("GET ORGANIZATION DETAILS ERROR:", err);
+  db.query(orgSql, [id], (orgErr, orgResult) => {
+    if (orgErr) {
+      console.error("GET ORGANIZATION ERROR:", orgErr);
       return res.status(500).json({
         success: false,
-        message: "Failed to fetch organization details",
+        message: "Failed to fetch organization",
       });
     }
 
-        console.log("Requested organization id:", id);
-    console.log("Organization details result:", result);
-
-    if (!result || result.length === 0) {
+    if (!orgResult || orgResult.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Organization not found",
       });
     }
 
-    return res.json({
-      success: true,
-      data: result[0],
+    const org = orgResult[0];
+
+    const profileSql = `
+      SELECT
+        id AS company_profile_id,
+        legal_name,
+        address,
+        country,
+        phone,
+        email,
+        type,
+        size,
+        industry,
+        reg_number,
+        vat,
+        inc_date,
+        procurement_count,
+        about,
+        linkedin,
+        twitter,
+        facebook,
+        instagram,
+        youtube,
+        nda_required,
+        vendor_form_required,
+        logo,
+        cover_image,
+        user_id
+      FROM company_profile
+      WHERE email = ?
+      ORDER BY id DESC
+      LIMIT 1
+    `;
+
+    db.query(profileSql, [org.organization_email], (profileErr, profileResult) => {
+      if (profileErr) {
+        console.error("GET COMPANY PROFILE ERROR:", profileErr);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to fetch company profile",
+        });
+      }
+
+      const profile =
+        profileResult && profileResult.length > 0 ? profileResult[0] : {};
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          ...org,
+          ...profile,
+        },
+      });
     });
   });
 };
