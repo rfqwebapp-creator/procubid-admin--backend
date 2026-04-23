@@ -58,6 +58,36 @@ router.post("/add", async (req, res) => {
   }
 });
 
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+
+  console.log("DELETE ORGANIZATION HIT, ID:", id);
+
+  const sql = "DELETE FROM organizations WHERE id = ?";
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("DELETE ERROR:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Delete failed",
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Organization not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Organization deleted successfully",
+    });
+  });
+});
+
 // GET single organization full details
 router.get("/:id/details", getOrganizationDetails);
 
