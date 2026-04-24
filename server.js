@@ -8,7 +8,8 @@
   const orgRoutes = require("./routes/organization");
   const subscriptionRoutes = require("./routes/subscriptionRoutes");
   const tenderRoutes = require("./routes/tenderRoutes");
-  ;
+  const dashboardRoutes = require("./routes/dashboardRoutes");
+  
 
 
   const cors = require("cors");
@@ -25,6 +26,7 @@
 
   app.use("/api", roleRoutes);
   app.use("/api", permissionRoutes);
+  app.use("/api/dashboard", dashboardRoutes);
 
   app.use("/api/organizations", orgRoutes);
   app.use("/api/subscriptions", subscriptionRoutes);
