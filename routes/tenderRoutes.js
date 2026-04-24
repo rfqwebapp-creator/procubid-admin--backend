@@ -10,6 +10,8 @@ const {
 // GET all tenders for admin
 router.get("/", getAdminTenders);
 
+router.get("/:id", getTenderById);
+
 // DELETE RFQ
 router.delete("/:id", deleteTender);
 
