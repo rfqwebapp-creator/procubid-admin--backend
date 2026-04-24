@@ -3,19 +3,21 @@ const router = express.Router();
 
 const {
   getAdminTenders,
+  getTenderById,
   deleteTender,
   suspendTender,
 } = require("../controllers/tenderController");
 
-// GET all tenders for admin
+// GET all tenders
 router.get("/", getAdminTenders);
 
+// GET single tender
 router.get("/:id", getTenderById);
 
-// DELETE RFQ
+// DELETE tender
 router.delete("/:id", deleteTender);
 
-// SUSPEND / UNBLOCK RFQ
+// BLOCK / UNBLOCK tender
 router.put("/:id/suspend", suspendTender);
 
 module.exports = router;
