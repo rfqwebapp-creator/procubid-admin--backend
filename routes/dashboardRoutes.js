@@ -2,46 +2,61 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
-router.get("/stats", (req, res) => {
-  const stats = {};
+router.get("/stats", async (req, res) => {
+  try {
+    const stats = {
+      organizations: 0,
+      activeUsers: 0,
+      openTenders: 0,
+      totalRevenue: 0,
+    };
 
-  // 1. Organizations count
-  db.query("SELECT COUNT(*) AS total FROM organizations", (err, orgResult) => {
-    if (err) return res.status(500).json({ error: err });
+    // Organizations
+    const [org] = await db.promise().query(
+      "SELECT COUNT(*) AS count FROM organizations"
+    );
+    stats.organizations = org[0].count;
 
-    stats.organizations = orgResult[0].total;
+    // Users
+    const [users] = await db.promise().query(
+      "SELECT COUNT(*) AS count FROM RegCustomers"
+    );
+    stats.activeUsers = users[0].count;
 
-    // 2. Users count
-    db.query("SELECT COUNT(*) AS total FROM RegCustomers", (err, userResult) => {
-      if (err) return res.status(500).json({ error: err });
+    // Tenders
+    const [tenders] = await db.promise().query(
+      "SELECT COUNT(*) AS count FROM rfqs"
+    );
+    stats.openTenders = tenders[0].count;
 
-      stats.users = userResult[0].total;
-
-      // 3. Active tenders count
-      db.query(
-        "SELECT COUNT(*) AS total FROM rfqs WHERE status = 'active'",
-        (err, tenderResult) => {
-          if (err) return res.status(500).json({ error: err });
-
-          stats.activeTenders = tenderResult[0].total;
-
-          // 4. Revenue (example)
-          db.query(
-            "SELECT SUM(amount) AS total FROM subscriptions",
-            (err, revenueResult) => {
-              if (err) return res.status(500).json({ error: err });
-
-              stats.revenue = revenueResult[0].total || 0;
-
-              return res.json({
-                success: true,
-                data: stats,
-              });
-            }
-          );
-        }
+    // Revenue (optional table)
+    try {
+      const [rev] = await db.promise().query(
+        "SELECT SUM(amount) AS total FROM subscriptions"
       );
+      stats.totalRevenue = rev[0].total || 0;
+    } catch (err) {
+      console.log("Revenue table not found, skipping...");
+    }
+
+    res.json({
+      success: true,
+      data: stats,
     });
+  } catch (error) {
+    console.error("Dashboard ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Dashboard failed",
+    });
+  }
+});
+
+router.get("/charts", (req, res) => {
+  res.json({
+    success: true,
+    tenderData: [],
+    revenueData: [],
   });
 });
 
