@@ -102,9 +102,10 @@ exports.suspendTender = (req, res) => {
     (error) => {
       if (error) {
         console.error("SUSPEND TENDER ERROR:", error);
+
         return res.status(500).json({
           success: false,
-          message: "Error updating tender block status",
+          message: "Error updating RFQ block status",
         });
       }
 
@@ -114,7 +115,6 @@ exports.suspendTender = (req, res) => {
           blockedValue === 1
             ? "RFQ blocked successfully"
             : "RFQ unblocked successfully",
-        is_blocked: blockedValue,
       });
     }
   );
