@@ -92,22 +92,29 @@ exports.deleteTender = (req, res) => {
 
 exports.suspendTender = (req, res) => {
   const { id } = req.params;
-  const { suspended } = req.body;
+  const { is_blocked } = req.body;
 
-  const statusValue = suspended ? "SUSPENDED" : "ACTIVE";
+  const blockedValue = Number(is_blocked) === 1 ? 1 : 0;
 
   db.query(
-    "UPDATE rfqs SET status = ? WHERE id = ?",
-    [statusValue, id],
+    "UPDATE rfqs SET is_blocked = ? WHERE id = ?",
+    [blockedValue, id],
     (error) => {
       if (error) {
         console.error("SUSPEND TENDER ERROR:", error);
-        return res.status(500).json({ success: false, message: "Error updating tender status" });
+        return res.status(500).json({
+          success: false,
+          message: "Error updating tender block status",
+        });
       }
 
       return res.status(200).json({
         success: true,
-        message: "Tender status updated successfully",
+        message:
+          blockedValue === 1
+            ? "RFQ blocked successfully"
+            : "RFQ unblocked successfully",
+        is_blocked: blockedValue,
       });
     }
   );
